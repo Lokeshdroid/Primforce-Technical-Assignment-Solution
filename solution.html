@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Read File</title>
+  </head>
+  <body style="text-align:center;">
+    <h1> Calculate Balance Sheet for a Month </h1>
+    <h3>Please Upload JSON File</h3>
+    <input id="file" type="file" />
+    <div id="demoShowA"></div>
+  </body>
+  <script>
+    (function() {                
+      function onChange(event) {
+        var reader = new FileReader();
+        reader.onload = onReaderLoad;
+        reader.readAsText(event.target.files[0]);
+      }
+
+      function onReaderLoad(event) {
+        var data = JSON.parse(event.target.result);
+            
+        // Get Expense Data and Revenue Date
+        var expenseData = data.expenseData;
+        var revenueData = data.revenueData;
+
+        var expenseDict = {}, revenueDict = {}, balanceDict = {}, JSONbalance={};
+        var cacheValue, date, amount;
+        var dates = [], balance = [];
+
+        // Get amount from Expense Data
+        for (var i = 0; i < expenseData.length; i++) {
+          date = expenseData[i].startDate;
+          amount = 0;
+                cacheValue = 0;
+
+          // Check if amount is present or not
+          if (("amount" in expenseData[i]))
+            amount = expenseData[i].amount;
+
+          // Handling Multiple Months as Single Month
+          if ((date in expenseDict))
+            cacheValue = expenseDict[date];
+
+          dates.push(date);
+          expenseDict[`${date}`] = cacheValue + amount;
+        }
+        
+        // Get amount from Revenue Data
+        for (var i = 0; i < revenueData.length; i++) {
+          date = revenueData[i].startDate;
+          amount = 0;
+                cacheValue = 0;
+
+          // Check if amount is present or not
+          if (("amount" in revenueData[i]))
+            amount = revenueData[i].amount;
+          
+                // Handling Multiple Months as Single Month
+          if ((date in revenueDict))
+            cacheValue = revenueDict[date];
+
+          dates.push(date);
+          revenueDict[`${date}`] = cacheValue + amount;
+        }
+
+        // Get Unique dates and sorting it
+        dates = [...new Set(dates)]
+        dates.sort();
+
+        for (var i = 0; i < dates.length; i++) {
+          balanceDict = {};
+          expenseAmount = 0,
+          revenueAmount = 0;
+                
+          // Checking dates are present in expenseDict and revenueDict
+          if ((dates[i] in expenseDict)) expenseAmount = expenseDict[dates[i]];
+          if ((dates[i] in revenueDict)) revenueAmount = revenueDict[dates[i]];
+
+          balanceDict["amount"] = revenueAmount - expenseAmount;
+          balanceDict["startDate"] = dates[i];
+
+          // Adding amount to each valid date
+          balance.push(balanceDict);
+        }
+
+        // Adding Balance to JSONbalance 
+        JSONbalance["balance"] = balance;
+        console.log(JSONbalance);
+        document.getElementById("demoShowA").innerHTML = "Please, Check the console for the output";
+      }
+
+      document.getElementById('file').addEventListener('change', onChange);
+      
+    }());
+
+  </script>
+</html>
