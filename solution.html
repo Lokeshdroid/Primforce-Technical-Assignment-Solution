@@ -7,6 +7,7 @@
     <h1> Calculate Balance Sheet for a Month </h1>
     <h3>Please Upload JSON File</h3>
     <input id="file" type="file" />
+    </br>
     <div id="demoShowA"></div>
   </body>
   <script>
@@ -25,7 +26,7 @@
         var revenueData = data.revenueData;
 
         var expenseDict = {}, revenueDict = {}, balanceDict = {}, JSONbalance={};
-        var cacheValue, date, amount;
+        var cacheValue, date, amount, minDate, maxDate, minMonth, maxMonth, minYear, maxYear, mo;
         var dates = [], balance = [];
 
         // Get amount from Expense Data
@@ -67,18 +68,44 @@
         // Get Unique dates and sorting it
         dates = [...new Set(dates)]
         dates.sort();
+        
+        // Get min and max Dates
+        maxDate = dates[dates.length-1];
+        minDate = dates[0];
 
-        for (var i = 0; i < dates.length; i++) {
+        // Get min and max Months
+        minMonth = parseInt(minDate.substring(5, 7));
+        maxMonth = parseInt(maxDate.substring(5, 7));
+        
+        // Get min and max Years
+        minYear = parseInt(minDate.substring(0,4));
+        maxYear = parseInt(maxDate.substring(0,4));
+
+        currentYear = minYear;
+        totalMonths = (maxYear - minYear) * 12 + maxMonth;
+
+        for (var i = minMonth-1; i < totalMonths; i++) {
           balanceDict = {};
           expenseAmount = 0,
           revenueAmount = 0;
-                
-          // Checking dates are present in expenseDict and revenueDict
-          if ((dates[i] in expenseDict)) expenseAmount = expenseDict[dates[i]];
-          if ((dates[i] in revenueDict)) revenueAmount = revenueDict[dates[i]];
+          month = (i % 12) + 1;
+          
+          // Creating current Date
+          currentMonth = (month < 10) ? ("0" + month) : month;
+          currentDate = currentYear+"-"+currentMonth+"-01T00:00:00.000Z";
+          
+          // Handling different years
+          if(minYear != maxYear && parseInt(currentMonth) == 12){
+            currentYear = currentYear + 1;
+          }
 
+          // Checking dates are present in expenseDict and revenueDict
+          if ((currentDate in expenseDict)) expenseAmount = expenseDict[currentDate];
+          if ((currentDate in revenueDict)) revenueAmount = revenueDict[currentDate];
+
+          // Calculate the Balance
           balanceDict["amount"] = revenueAmount - expenseAmount;
-          balanceDict["startDate"] = dates[i];
+          balanceDict["startDate"] = currentDate;
 
           // Adding amount to each valid date
           balance.push(balanceDict);
@@ -87,6 +114,7 @@
         // Adding Balance to JSONbalance 
         JSONbalance["balance"] = balance;
         console.log(JSONbalance);
+
         document.getElementById("demoShowA").innerHTML = "Please, Check the console for the output";
       }
 
