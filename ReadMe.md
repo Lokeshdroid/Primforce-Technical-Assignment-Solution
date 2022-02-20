@@ -23,3 +23,16 @@ Revenue and expenses may have multiple entries per month, may have missing data 
 
 ### Sample data
 2 set of files have been included where input is sample input data and output is the expected values.
+
+
+# Solution
+
+You can found the solution in index.html file.
+
+# Deployment
+
+The web Application is deployed in this URL.
+
+https://lokeshdroid.github.io/Primforce-Technical-Assignment-Solution/
+
+Thank you for giving me this opportunity
